@@ -1,13 +1,14 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="org.json.*" %>
+<%! String id = null; %>
 <!DOCTYPE html>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<link rel="stylesheet" href="viewProfile.css">
-	<title>Owner Dashboard</title>
+	<title>View Profile</title>
 </head>
 
 <body>
@@ -34,7 +35,7 @@
 				p4.setString(2,"owner");
 				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
 				p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
-				p4.setString(5,"Visit Owner Dashboard");
+				p4.setString(5,"View Profile Details");
 				p4.executeUpdate();
 			}
 		}catch(Exception e){
@@ -93,7 +94,7 @@
 			</form>
 			<h4>
 				<%
-					String id = (String) session.getAttribute("id");
+					String id = request.getParameter("id");
 					Class.forName("com.mysql.jdbc.Driver");
 					Connection con5=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
 					PreparedStatement p5=con5.prepareStatement("select *from owner_details where owner_id=?");
@@ -126,124 +127,78 @@
 					<h1>Owner Dashboard</h1>
 					<ul class="breadcrumb">
 						<li>
-							<a href="#">Dashboard</a>
+							<a href="#">View Profile</a>
 						</li>
 						</ul>
 				</div>
 			</div>
-			<ul class="box-info">
-				<li>
-					<i class='bx bx-home-smile'></i>
-					<span class="text">
-						<h3>
-							<%
-								String ans;
-								Class.forName("com.mysql.jdbc.Driver");
-								Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-								PreparedStatement p1=con1.prepareStatement("select count(*) as ans from house_details where owner_id=?");
-								p1.setString(1,id);
-								ResultSet r1=p1.executeQuery();
-								if(r1.next()){
-									out.println(r1.getString("ans"));
-								}
-								con1.close();
-							%>
-						</h3>
-						<p>Total House</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-institution' ></i>
-					<span class="text">
-						<h3>
-							<%
-								try{
-									out.println("0");
-									String ans2;
-									String owner_id=(String) session.getAttribute("id");
-									
-									Class.forName("com.mysql.jdbc.Driver");
-									Connection con2=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-									PreparedStatement p2=con2.prepareStatement("select count(*) as ans2 from house_details where status=? and owner_id=?");
-									p2.setString(1,"available");
-									p2.setString(2,owner_id);
-									ResultSet r2=p2.executeQuery();
-									if(r2.next()){
-										out.println(r1.getString("ans2"));
-									}
-								}catch(Exception e){
-									System.out.println(e);
-								}
-							%>
-						</h3>
-						<p>Available House</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bx-git-pull-request' ></i>
-					<span class="text">
-						<h3><%
-							try {
-							    String ans1;
-							    Class.forName("com.mysql.jdbc.Driver");
-							    Connection con3 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-							    PreparedStatement p3 = con3.prepareStatement("select count(*) as ans1 from house_details where request=? and owner_id=?");
-							    p3.setString(1, "pending");
-							    p3.setString(2, id);
-							    ResultSet r3 = p3.executeQuery();
-							    if (r3.next()) {
-							        out.println(r3.getString("ans1"));
-							    }
-							    con3.close();
-							} catch (Exception e) {
-							    out.println(e);
-							}
-							%>
-
-						</h3>
-						<p>Pending Requests</p>
-					</span>
-				</li>
-			</ul>
+			
+			<%
+				try {
+						Class.forName("com.mysql.jdbc.Driver");
+						Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+						PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
+						p.setString(1, id);
+						ResultSet r=p.executeQuery();
+						if(r.next()) {
+			%>					
 			<div class="table-data">
 				<div class="order">
 					<div class="head">
-						<h3>Recent Request</h3>
+						<h3>Owner Profile</h3>
 					</div>
-					<table>
+					<table class="text">
 						<thead>
 							<tr>
-								<th>User</th>
-								<th>Date</th>
-								<th>Request Status</th>
+								<td>Owner ID</td>
+								<td><%= r.getString("owner_id") %></td>
+								<td></td>
 							</tr>
 						</thead>
 						<tbody>
-							<%
-								String id1 = (String) session.getAttribute("id");
-								Class.forName("com.mysql.jdbc.Driver");
-								Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-								PreparedStatement p=con.prepareStatement("select *from renting_details where owner_id=?");
-								p.setString(1,id1);
-							ResultSet r=p.executeQuery();
-							while(r.next()){
-								if(r.getString("request").equals("pending")){
-							%>
-								<tr>
-									<td>
-										<p><%= r.getString("tenant_name") %></p>
-									</td>
-									<td><%= r.getString("date") %></td>
-									<td><span class="status completed"><%= r.getString("request") %></span></td>
-								</tr>
-							<%} 
-							}
-							con.close();
-							%>
-							</tbody>
+							<tr>
+								<td>Owner Name</td>
+								<td><%= r.getString("name") %></td>
+							</tr>
+							<tr>
+								<td>Password</td>
+								<td><%= r.getString("password") %></td>
+							</tr>
+							<tr>
+								<td>Contact No</td>
+								<td><%= r.getString("contact_no") %></td>
+							</tr>
+							<tr>
+								<td>Email</td>
+								<td><%= r.getString("email_id") %></td>
+							</tr>
+							<tr>
+								<td>Age</td>
+								<td><%= r.getString("age") %></td>
+							</tr>
+							<tr>
+								<td>
+									<form action="update_owner.jsp" method="POST">
+										<input type="hidden" value="<%= id %>" name="id">
+										<input type="submit" value="Update" name="Update" style="
+										padding:10px;
+										font-size:17px;
+										background-color:#3C91E6;
+										color:#fff;
+										border:0px solid #3C91E6;
+										border-radius:10px;">
+									</form>
+								</td>
+							</tr>
+						</tbody>
 					</table>
 				</div>
 			</div>
+			<%		}
+					}catch(Exception e) {
+						out.println(e);
+					}
+	 		%>
 		</main>
 	</section>
 	<script src="script.js"></script>

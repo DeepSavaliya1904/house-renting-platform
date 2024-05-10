@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="org.json.*" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +31,11 @@
     </style>
 </head>
 <body>
-	        <%
-					if(session.getAttribute("tenant") == null || session.getAttribute("admin")==null)									
-					{
-						response.sendRedirect("error.jsp");							
-					}
-			%>
+	 <%
+	 	if(session.getAttribute("owner")==null){
+	 		response.sendRedirect("error.jsp");
+	 	}
+	 %>       
     <nav class="navbar navbar-expand-lg" style="background-color: #2288ff;">
         <div class="container-fluid">
             <a class="navbar-brand text-light" href="../home.jsp" style="margin-left: 20px;"><i class='bx bx-home-heart'></i> House Renting Platform</a>
@@ -51,7 +51,7 @@
         </div>
     </nav>
     <br><br>
-    <form action="../ManageOwner_U" method="POST">
+    <form action="../UpdateOwner" method="POST">
         <%
             try {
                 Class.forName("com.mysql.jdbc.Driver");
@@ -62,7 +62,7 @@
                 while (r.next()) {
         %>
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="id" name="o_id" placeholder="Enter your id" value="<%= r.getString("owner_id") %>" readonly>
+            <input type="text" class="form-control" id="id" name="o_id" placeholder="Enter your id" value="<%= r.getString("owner_id")%>" readonly>
             <label for="id">ID</label>
         </div>
         <div class="form-floating mb-3">
@@ -95,8 +95,5 @@
     <input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Update">
 </form>
 <br><br><br>
-<%
-    
-%>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
-<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Date,org.json.*" %>
 <%! String id = null; %>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,9 +35,9 @@
             <!-- Login form -->
             <form action="owner_login.jsp" method="POST">
                 <span>Enter your username</span>
-                <input type="text" name="username" placeholder="Enter username" pattern="[A-Za-z0-9]+" title="Only letters and numbers are allowed" required>
+                <input type="text" name="username" id="username" placeholder="Enter username" pattern="[A-Za-z0-9]+" title="Only letters and numbers are allowed" required>
                 <span>Enter your password</span>
-                <input type="password" name="password" placeholder="Enter password" pattern="{5,8}" title="please enter valid pattern" required>
+                <input type="password" name="password" id="password" placeholder="Enter password" pattern="{5,8}" title="please enter valid pattern" required>
                 <input type="submit" value="Log in" class="button">
                 </form>
                 <center>OR</center>
@@ -56,7 +56,7 @@
 				
 				else {
 				    try {
-				        Class.forName("com.mysql.jdbc.Driver");
+				    	Class.forName("com.mysql.jdbc.Driver");
 				        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
 				        PreparedStatement p = con.prepareStatement("select * from owner_details where name=? AND password=?");
 				        p.setString(1, username);
@@ -82,7 +82,7 @@
 				            } catch (Exception e) {
 				                e.printStackTrace();
 				            }
-			%>
+							%>
 				
 				<!-- sweetalert for alert message -->
 				<script type="text/javascript">

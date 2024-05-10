@@ -17,7 +17,7 @@
     <header>
         <div class="nav container">
             <!-- Logo -->
-            <a href="Index.html" class="logo"><i class='bx bx-home-heart'></i>House <br> Rental</a>
+            <a href="home.jsp" class="logo"><i class='bx bx-home-heart'></i>House <br> Rental</a>
 
             <!-- Menu-Icon -->
             <input type="checkbox" id="menu">

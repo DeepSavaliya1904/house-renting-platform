@@ -2,6 +2,8 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="org.json.JSONArray, org.json.JSONObject" %>
+
 <%! String id = null; %>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,11 +65,23 @@
                 //p.setString(2,password);
                 Statement s=con.createStatement();
                 ResultSet r=s.executeQuery(query);
+                JSONArray array = new JSONArray();
+                JSONObject obj = new JSONObject();
                  if(r.next()){
                     id = r.getString("tenant_id");
 		            session.setAttribute("id", id);
 		            session.setAttribute("tenant", "tenant");
 		            try {
+		            	obj.put("tenant_id",r.getString("tenant_id"));
+		            	obj.put("tenant_name",r.getString("name"));
+		            	obj.put("password",r.getString("password"));
+		            	obj.put("contact_no",r.getString("contact_no"));
+		            	obj.put("email_id",r.getString("email_id"));
+		            	obj.put("gender",r.getString("cast"));
+		            	obj.put("adharno",r.getString("adharno"));
+		                array.put(obj);
+		                request.setAttribute("jsonData", array.toString());
+						System.out.println(array.toString());
 		                Date currentDate = new Date();
 		                Class.forName("com.mysql.jdbc.Driver");
 		                Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");

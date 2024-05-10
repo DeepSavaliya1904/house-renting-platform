@@ -128,7 +128,7 @@
         p.setInt(8, t_id);
         p.executeUpdate();
 		
-        response.sendRedirect("manage_tenant.jsp");
+        //response.sendRedirect("manage_tenant.jsp");
     } catch (Exception e) {
         e.printStackTrace();
     }

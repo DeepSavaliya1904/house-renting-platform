@@ -37,7 +37,7 @@
 	%>
     <nav class="navbar navbar-expand-lg" style="background-color: #2288ff;">
         <div class="container-fluid">
-            <a class="navbar-brand text-light" href="../home.html" style="margin-left: 20px;"><i class='bx bx-home-heart'></i> House Renting Platform</a>
+            <a class="navbar-brand text-light" href="../home.jsp" style="margin-left: 20px;"><i class='bx bx-home-heart'></i> House Renting Platform</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

@@ -101,8 +101,6 @@
 					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
 				</div>
 			</form>
-			<input type="checkbox" id="switch-mode" hidden>
-			<label for="switch-mode" class="switch-mode"></label>
 			<h5>
 				<%
 					Class.forName("com.mysql.jdbc.Driver");
@@ -118,6 +116,17 @@
 			<a href="#" class="profile">
 				<img src="image.png">
 			</a>
+			<form action="viewProfile.jsp" method="GET" style="margin-right:-300px;">	
+					<input type="hidden" value="<%= id %>" name="id">
+					<input type="submit" value="view Profile" name="view Profile" style="
+						padding:10px;
+						font-size:17px;
+						background-color:#3C91E6;
+						color:#fff;
+						border:0px solid #3C91E6;
+						border-radius:10px;
+					">
+			</form>	
 		</nav>
 		
 		<main style="background-color: #eee; height: 100vh;">
@@ -166,7 +175,7 @@
 				        <td><%= r1.getString("request") %></td>
 				        <td style="display:flex;">
 				            <form action="updateHouse.jsp" method="POST">
-				                <input type="hidden" name="id" value="<%= r1.getString("house_id") %>">
+				            	<input type="hidden" name="id" value="<%= r1.getString("house_id") %>">
 				                <button type="submit" class="btn btn-primary" style="margin-right:20px;">Update</button>
 				            </form>
 				            <form action="../DeleteHouse" method="POST">
