@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 28, 2024 at 06:49 AM
+-- Generation Time: Apr 22, 2024 at 01:46 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -83,7 +83,7 @@ CREATE TABLE `house_details` (
 INSERT INTO `house_details` (`house_id`, `owner_id`, `address`, `square_footage`, `num_of_bedrooms`, `num_of_bathrooms`, `rent_of_house`, `house_type`, `status`, `img`, `request`, `area`) VALUES
 (1, 1, '234 Evergreen Terrace, Crestwood County, Tranquility Township, Harmony District, Blissful State, 98765', '1000', 3, 3, '1200', 'Duplex', 'unavailable', 'House1.jpg', 'accept', 'ahmedabad'),
 (2, 1, '434 Evergreen Terrace, Crestwood County, Tranquility Township, Harmony District, Blissful State, 98765', '2000', 4, 4, '2200', 'Flat', 'available', 'House2.jpg', 'accept', 'ahmedabad'),
-(3, 2, '1234 Willow Lane, Apartment 5678, Springfield Heights, Tranquility Township, 57685', '1500', 3, 2, '1500', 'Flat', 'available', 'House3.jpg', 'accept', 'surat'),
+(3, 2, '1234 Willow Lane, Apartment 5678, Springfield Heights, Tranquility Township, 57685', '1500', 3, 2, '1500', 'Flat', 'unavailable', 'House3.jpg', 'accept', 'surat'),
 (4, 2, '5678 Maple Avenue, Suite 9101, Cedarwood Court, Harmony Township, Tranquility District 29334', '2000', 3, 3, '3000', 'Bungalow', 'available', 'House4.jpg', 'accept', 'ahmedabad'),
 (5, 4, '5678 Elm Road, Suite 9101, Cedarwood Manor, Blissful Township, Harmony District 29334', '2200', 3, 3, '3000', 'Flat', 'available', 'House5.jpg', 'accept', 'ahmedabad'),
 (6, 4, '9101 Cedar Lane, Suite 5678, Maplewood Villa, Serenity Township, Tranquility District 29334', '2500', 3, 3, '3555', 'Duplex', 'available', 'House6.jpg', 'accept', 'ahmedabad');
@@ -108,23 +108,17 @@ CREATE TABLE `login_details` (
 --
 
 INSERT INTO `login_details` (`login_id`, `login_as`, `username`, `password`, `date`, `time`) VALUES
-(1, 'owner', 'priya', 'priya@07', '2024-03-22', '12:17:31'),
-(2, 'owner', 'deep', 'deep@09', '2024-03-22', '12:18:45'),
-(3, 'owner', 'angel', 'angel@29', '2024-03-22', '12:19:24'),
-(4, 'owner', 'priya', 'priya@07', '2024-03-22', '13:28:32'),
-(5, 'owner', 'deep', 'deep@09', '2024-03-22', '13:30:21'),
-(6, 'owner', 'angel', 'angel@29', '2024-03-22', '13:34:55'),
-(7, 'tenant', 'dhruvi', 'dhruvi@07', '22-03-2024', '13:37:59'),
-(8, 'tenant', 'keyur', 'keyur@23', '22-03-2024', '13:41:44'),
-(9, 'owner', 'priya', 'priya@07', '2024-03-22', '13:42:30'),
-(10, 'tenant', 'keyur', 'keyur@23', '22-03-2024', '13:43:53'),
-(11, 'owner', 'priya', 'priya@07', '2024-03-22', '13:44:14'),
-(12, 'tenant', 'dhruvi', 'dhruvi@07', '22-03-2024', '13:47:59'),
-(13, 'tenant', 'keyur', 'keyur@23', '22-03-2024', '13:48:23'),
-(14, 'tenant', 'dhruvi', 'dhruvi@07', '22-03-2024', '18:16:05'),
-(15, 'tenant', 'test\' or \'1\'=\'1 ', '\' or \'1\'=\'1 ', '22-03-2024', '18:22:44'),
-(16, 'tenant', 'a\' or \'1\'=\'1', 'a\' or \'1\'=\'1', '22-03-2024', '18:24:14'),
-(17, 'tenant', 'test\' UNION ALL SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL-- -', 'test', '22-03-2024', '18:28:03');
+(1, 'tenant', 'keyur', 'keyur@23', '22-04-2024', '14:18:00'),
+(2, 'tenant', 'dhruvi', 'dhruvi@07', '22-04-2024', '14:31:55'),
+(3, 'tenant', 'keyur', 'keyur@23', '22-04-2024', '14:41:54'),
+(4, 'tenant', 'dhruvi', 'dhruvi@07', '22-04-2024', '14:52:00'),
+(5, 'owner', 'deep', 'Deep@09', '2024-04-22', '14:53:29'),
+(6, 'owner', 'deep', 'Deep@09', '2024-04-22', '14:54:01'),
+(7, 'tenant', 'dhruvi', 'dhruvi@07', '22-04-2024', '14:57:53'),
+(8, 'tenant', 'dhruvi', 'dhruvi@07', '22-04-2024', '15:25:09'),
+(9, 'tenant', 'dhruvi', 'dhruvi@07', '22-04-2024', '15:38:06'),
+(10, 'tenant', '\'or\'1=1', '\'or\'1=1', '22-04-2024', '15:44:34'),
+(11, 'tenant', 'dhruvi', 'Dhruvi@07', '22-04-2024', '15:45:27');
 
 -- --------------------------------------------------------
 
@@ -166,6 +160,13 @@ CREATE TABLE `renting_details` (
   `request` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `renting_details`
+--
+
+INSERT INTO `renting_details` (`house_id`, `tenant_id`, `owner_id`, `tenant_name`, `date`, `rent_price`, `request`) VALUES
+(3, 4, 2, 'dhruvi', '22-04-2024', '1500', 'accept');
+
 -- --------------------------------------------------------
 
 --
@@ -179,7 +180,7 @@ CREATE TABLE `tenant_details` (
   `contact_no` varchar(10) NOT NULL,
   `email_id` varchar(20) NOT NULL,
   `gender` varchar(10) NOT NULL,
-  `cast` varchar(20) NOT NULL,
+  `cast` varchar(100) NOT NULL,
   `adharno` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -189,7 +190,8 @@ CREATE TABLE `tenant_details` (
 
 INSERT INTO `tenant_details` (`tenant_id`, `name`, `password`, `contact_no`, `email_id`, `gender`, `cast`, `adharno`) VALUES
 (4, 'dhruvi', 'dhruvi@07', '6354827872', 'dhruvi07@gmail.com', 'female', 'hindu', '2554-3343-5443'),
-(5, 'keyur', 'keyur@23', '6354827854', 'keyur@gmail.com', 'female', 'hindu', '2323-2345-4532');
+(5, 'keyur', 'keyur@23', '6354827854', 'keyur@gmail.com', 'female', 'hindu', '2323-2345-4532'),
+(10, 'sanjay', 'sanjay@1', '1231231231', 'sanjay@gmail.com', 'male', '\"><script>alert(document.cookie)</script>', '1234-5434-2323');
 
 -- --------------------------------------------------------
 
@@ -204,76 +206,6 @@ CREATE TABLE `track_activity` (
   `Time` varchar(100) NOT NULL,
   `Activity` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `track_activity`
---
-
-INSERT INTO `track_activity` (`Username`, `Role`, `Date`, `Time`, `Activity`) VALUES
-('priya', 'owner', '2024-03-22', '12:17:34', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '12:17:45', 'open add house details page'),
-('deep', 'owner', '2024-03-22', '12:18:47', 'Visit Owner Dashboard'),
-('angel', 'owner', '2024-03-22', '12:19:28', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '13:28:35', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '13:28:37', 'open add house details page'),
-('priya', 'owner', '2024-03-22', '13:29:06', 'add House Details'),
-('priya', 'owner', '2024-03-22', '13:29:06', 'open add house details page'),
-('priya', 'owner', '2024-03-22', '13:29:37', 'add House Details'),
-('priya', 'owner', '2024-03-22', '13:29:37', 'open add house details page'),
-('priya', 'owner', '2024-03-22', '13:30:09', 'open Manage House Details page'),
-('deep', 'owner', '2024-03-22', '13:30:23', 'Visit Owner Dashboard'),
-('deep', 'owner', '2024-03-22', '13:30:25', 'open add house details page'),
-('deep', 'owner', '2024-03-22', '13:32:54', 'add House Details'),
-('deep', 'owner', '2024-03-22', '13:32:54', 'open add house details page'),
-('deep', 'owner', '2024-03-22', '13:34:20', 'add House Details'),
-('deep', 'owner', '2024-03-22', '13:34:20', 'open add house details page'),
-('deep', 'owner', '2024-03-22', '13:34:45', 'open Manage House Details page'),
-('angel', 'owner', '2024-03-22', '13:34:57', 'Visit Owner Dashboard'),
-('angel', 'owner', '2024-03-22', '13:35:00', 'open add house details page'),
-('angel', 'owner', '2024-03-22', '13:35:38', 'add House Details'),
-('angel', 'owner', '2024-03-22', '13:35:39', 'open add house details page'),
-('angel', 'owner', '2024-03-22', '13:36:21', 'add House Details'),
-('angel', 'owner', '2024-03-22', '13:36:21', 'open add house details page'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:01', 'Visit Tenant Homepage'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:05', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:08', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:12', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:23', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '13:38:36', 'show Properties Details'),
-('dhruvi', 'tenant', '2024-03-22', '13:40:00', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '13:40:31', 'show sent Request'),
-('keyur', 'tenant', '2024-03-22', '13:41:47', 'Visit Tenant Homepage'),
-('keyur', 'tenant', '2024-03-22', '13:41:48', 'Visit Properties page'),
-('keyur', 'tenant', '2024-03-22', '13:41:50', 'show Properties Details'),
-('keyur', 'tenant', '2024-03-22', '13:41:54', 'Visit Properties page'),
-('keyur', 'tenant', '2024-03-22', '13:41:56', 'show sent Request'),
-('keyur', 'tenant', '2024-03-22', '13:42:07', 'Visit Properties page'),
-('priya', 'owner', '2024-03-22', '13:42:32', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '13:42:34', 'check the status of the house'),
-('priya', 'owner', '2024-03-22', '13:42:39', 'open Manage House Details page'),
-('priya', 'owner', '2024-03-22', '13:42:41', 'open add house details page'),
-('priya', 'owner', '2024-03-22', '13:42:42', 'check the status of the house'),
-('keyur', 'tenant', '2024-03-22', '13:43:55', 'Visit Tenant Homepage'),
-('keyur', 'tenant', '2024-03-22', '13:43:58', 'show sent Request'),
-('priya', 'owner', '2024-03-22', '13:44:16', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '13:44:17', 'check the status of the house'),
-('priya', 'owner', '2024-03-22', '13:46:52', 'check the status of the house'),
-('priya', 'owner', '2024-03-22', '13:47:00', 'Visit Owner Dashboard'),
-('priya', 'owner', '2024-03-22', '13:47:03', 'check the status of the house'),
-('priya', 'owner', '2024-03-22', '13:47:42', 'check the status of the house'),
-('priya', 'owner', '2024-03-22', '13:47:46', 'check the status of the house'),
-('dhruvi', 'tenant', '2024-03-22', '13:48:01', 'Visit Tenant Homepage'),
-('dhruvi', 'tenant', '2024-03-22', '13:48:03', 'show sent Request'),
-('dhruvi', 'tenant', '2024-03-22', '13:48:05', 'show approved Request'),
-('dhruvi', 'tenant', '2024-03-22', '13:48:10', 'show approved Request'),
-('keyur', 'tenant', '2024-03-22', '13:48:25', 'Visit Tenant Homepage'),
-('keyur', 'tenant', '2024-03-22', '13:48:27', 'show sent Request'),
-('keyur', 'tenant', '2024-03-22', '13:48:30', 'show sent Request'),
-('keyur', 'tenant', '2024-03-22', '13:48:31', 'show approved Request'),
-('dhruvi', 'tenant', '2024-03-22', '18:16:08', 'Visit Tenant Homepage'),
-('dhruvi', 'tenant', '2024-03-22', '18:24:16', 'Visit Tenant Homepage'),
-('dhruvi', 'tenant', '2024-03-22', '18:24:23', 'Visit Properties page'),
-('dhruvi', 'tenant', '2024-03-22', '18:24:26', 'Visit Tenant Homepage');
 
 --
 -- Indexes for dumped tables
@@ -344,7 +276,7 @@ ALTER TABLE `house_details`
 -- AUTO_INCREMENT for table `login_details`
 --
 ALTER TABLE `login_details`
-  MODIFY `login_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `login_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `owner_details`
@@ -356,7 +288,7 @@ ALTER TABLE `owner_details`
 -- AUTO_INCREMENT for table `tenant_details`
 --
 ALTER TABLE `tenant_details`
-  MODIFY `tenant_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `tenant_id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
