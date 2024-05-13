@@ -2,7 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.json.JSONArray, org.json.JSONObject" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 
 <%! String id = null; %>
 <!DOCTYPE html>
@@ -17,6 +17,7 @@
 </head>
 <body>
 	<%
+		//ensure that user already login or not
 		if(session.getAttribute("tenant")!=null){
 			response.sendRedirect("tenant_dashboard.jsp");
 		}
@@ -53,38 +54,31 @@
         String password=request.getParameter("password");
         
         if(username==null && password==null){
+        	//check that username and password null or not
+        	out.println("invalid operation");
         }
         
         else{
+        	//create jdbc connection
+        	Connection con=null;
+        	Connection con1=null;
             try{
-            	Class.forName("com.mysql.jdbc.Driver");
-                Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-                String query = "select *from tenant_details where name='"+ username +"' AND password='" + password + "'";
-               // PreparedStatement p=con.prepareStatement("select *from tenant_details where name=? AND password=?");
-                //p.setString(1,username);
-                //p.setString(2,password);
+				con=DbConnection.getConnection();
+				
+				//raw query of login
+            	String query = "select *from tenant_details where name='"+ username +"' AND password='" + password + "'";
                 Statement s=con.createStatement();
                 ResultSet r=s.executeQuery(query);
-                JSONArray array = new JSONArray();
-                JSONObject obj = new JSONObject();
                  if(r.next()){
+                	session.setAttribute("manage_owner","manage_owner");
+                	//create a session after successfully login
                     id = r.getString("tenant_id");
 		            session.setAttribute("id", id);
 		            session.setAttribute("tenant", "tenant");
 		            try {
-		            	obj.put("tenant_id",r.getString("tenant_id"));
-		            	obj.put("tenant_name",r.getString("name"));
-		            	obj.put("password",r.getString("password"));
-		            	obj.put("contact_no",r.getString("contact_no"));
-		            	obj.put("email_id",r.getString("email_id"));
-		            	obj.put("gender",r.getString("cast"));
-		            	obj.put("adharno",r.getString("adharno"));
-		                array.put(obj);
-		                request.setAttribute("jsonData", array.toString());
-						System.out.println(array.toString());
+		            	//store the login data into login_details table
 		                Date currentDate = new Date();
-		                Class.forName("com.mysql.jdbc.Driver");
-		                Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+		             	con1=DbConnection.getConnection();
 		                PreparedStatement p1 = con1.prepareStatement("insert into login_details(login_as,username,password, date, time) values(?,?,?,?,?)");
 		                p1.setString(1, "tenant");
 		                p1.setString(2, username);
@@ -96,6 +90,8 @@
 		                p1.executeUpdate();
 		            } catch (Exception e) {
 		                e.printStackTrace();
+		            }finally{
+		            	con1.close();
 		            }
 
     %>
@@ -131,6 +127,9 @@
     <%      }
         }catch(Exception e){
             out.println(e);
+        }finally{
+        	//close connection
+        	con.close();
         }
     }
     %>

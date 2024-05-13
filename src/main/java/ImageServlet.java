@@ -18,14 +18,7 @@ public class ImageServlet extends HttpServlet {
         
         if (filename != null && !filename.isEmpty()) {
             response.setContentType("image/jpeg"); 
-            
-//            //filename="/uploads/"+filename;
-//            String imagePath = getServletContext().getRealPath("/uploads/");
-//            String filePath = imagePath + File.separator + filename;
-//            File imageFile = new File(filename);
-//            String physicalPath = imageFile.getAbsolutePath();
-//            System.out.println(physicalPath);
-            
+                        
             Path basePath = FileSystems.getDefault().getPath(getServletContext().getRealPath("house_renting_platform"));
             Path resolvedPath = basePath.getParent().resolve(filename); // use getParent() if basePath is a file (not a directory) 
             Path abolutePath = resolvedPath.normalize();

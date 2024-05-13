@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date,org.json.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <%! String id = null; %>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,10 +16,12 @@
 </head>
 <body>
 	<%
+		//check owner already login or not
 		if(session.getAttribute("owner")!=null){
 			response.sendRedirect("owner_dashboard.jsp");
 		}
 	%>
+	<!-- header -->
     <header>
         <div class="nav container">
             <!-- Logo -->
@@ -47,42 +50,40 @@
         <img src="img/owner_login.png" height="450" width="500" style="margin-left:120px; margin-top:40px">
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-			<%
-				String username=request.getParameter("username");
-				String password=request.getParameter("password");
-				
-				if(username==null && password==null){
-				}
-				
-				else {
-				    try {
-				    	Class.forName("com.mysql.jdbc.Driver");
-				        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-				        PreparedStatement p = con.prepareStatement("select * from owner_details where name=? AND password=?");
-				        p.setString(1, username);
-				        p.setString(2, password);
-				        ResultSet r = p.executeQuery();
-				        if (r.next()) {
-				        	session.setAttribute("owner","owner");
-				            id = r.getString("owner_id");
-				            session.setAttribute("id", id);
-				            try {
-				                Date currentDate = new Date();
-				                Class.forName("com.mysql.jdbc.Driver");
-				                Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-				                PreparedStatement p1 = con1.prepareStatement("insert into login_details(login_as,username,password, date, time) values(?,?,?,?,?)");
-				                p1.setString(1, "owner");
-				                p1.setString(2, username);
-				                p1.setString(3,password);
-				                p1.setString(4, new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
-				                p1.setString(5, new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
-
-				                // Execute the update to insert login details
-				                p1.executeUpdate();
-				            } catch (Exception e) {
-				                e.printStackTrace();
-				            }
-							%>
+	<%
+		String username=request.getParameter("username");
+		String password=request.getParameter("password");
+	
+		if(username==null && password==null){
+			out.println("invalid operation");
+		}
+			
+		else {
+			Connection con=null;
+			try {
+				con = DbConnection.getConnection();
+				PreparedStatement p = con.prepareStatement("select * from owner_details where name=? AND password=?");
+				p.setString(1, username);
+				p.setString(2, password);
+				ResultSet r = p.executeQuery();
+				if (r.next()) {
+					//set session value after login 
+					session.setAttribute("owner","owner");
+					id = r.getString("owner_id");
+					session.setAttribute("id", id);
+					try {
+						Date currentDate = new Date();
+						PreparedStatement p1 = con.prepareStatement("insert into login_details(login_as,username,password, date, time) values(?,?,?,?,?)");
+						p1.setString(1, "owner");
+						p1.setString(2, username);
+						p1.setString(3,password);
+						p1.setString(4, new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
+						p1.setString(5, new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
+						// Execute the update to insert login details
+						p1.executeUpdate();
+					} catch (Exception e) {
+							e.printStackTrace();
+					}%>
 				
 				<!-- sweetalert for alert message -->
 				<script type="text/javascript">
@@ -117,6 +118,9 @@
 			<%      }
 				}catch(Exception e){
 					out.println(e);
+				}finally{
+					//close connection
+					con.close();
 				}
 			}
 			%>

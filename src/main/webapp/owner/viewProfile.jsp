@@ -1,6 +1,6 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.json.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <%! String id = null; %>
 <!DOCTYPE html>
 <head>
@@ -10,23 +10,24 @@
 	<link rel="stylesheet" href="viewProfile.css">
 	<title>View Profile</title>
 </head>
-
+<!-- Body start -->
 <body>
 	<%
+		//check owner already login or not
 		if(session.getAttribute("owner")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
 	<%
+		Connection con=null; 
 		try{
 			String id = (String) session.getAttribute("id");
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+			con=DbConnection.getConnection();
 			PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
 			p.setString(1,id);
 			ResultSet r=p.executeQuery();
 			if(r.next()){
-				
+				//track activity
 		    	Date currentDate = new Date();
 		    	Class.forName("com.mysql.jdbc.Driver");
 				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
@@ -40,6 +41,9 @@
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally{
+			//close connection
+			con.close();
 		}
 	%>
 	<section id="sidebar">
@@ -94,15 +98,17 @@
 			</form>
 			<h4>
 				<%
+					//create connection
 					String id = request.getParameter("id");
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con5=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-					PreparedStatement p5=con5.prepareStatement("select *from owner_details where owner_id=?");
+					Connection con2=DbConnection.getConnection();
+					PreparedStatement p5=con2.prepareStatement("select *from owner_details where owner_id=?");
 					p5.setString(1,id);
 					ResultSet r5=p5.executeQuery();
 					if(r5.next()){
 						out.println(r5.getString("name"));
 					}
+					//close connection
+					con2.close();
 				%>
 			</h4>
 			<a href="#" class="profile">
@@ -134,10 +140,10 @@
 			</div>
 			
 			<%
+				Connection con1=null;
 				try {
-						Class.forName("com.mysql.jdbc.Driver");
-						Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-						PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
+						con1=DbConnection.getConnection();
+						PreparedStatement p=con1.prepareStatement("select *from owner_details where owner_id=?");
 						p.setString(1, id);
 						ResultSet r=p.executeQuery();
 						if(r.next()) {
@@ -194,9 +200,12 @@
 					</table>
 				</div>
 			</div>
-			<%		}
+			<%			}
 					}catch(Exception e) {
 						out.println(e);
+					}finally{
+						//close connection
+						con1.close();
 					}
 	 		%>
 		</main>

@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1" session="false"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,9 +99,9 @@
                 	 <h1><span>Properties</span></h1>
                     <div class="menu_box">
                 		<%
+                			Connection con=null; 
 						    try {
-						        Class.forName("com.mysql.jdbc.Driver");
-						        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+						        con = DbConnection.getConnection();
 						        PreparedStatement p;
 						        p = con.prepareStatement("select * from house_details where request=? and status=?");
 						        p.setString(1, "accept");
@@ -132,6 +133,7 @@
 						        </div>
 						    </div>
 						<%
+							con.close();
 						        }
 						    } catch (Exception e) {
 						        e.printStackTrace();

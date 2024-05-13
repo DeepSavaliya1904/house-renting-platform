@@ -2,7 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.servlet.http.*" %>
-
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,16 +29,18 @@
             <p>Log in with your data that you entered during your registration</p>
             <!-- Login form -->
             <form action="admin_login.jsp" method="POST">
-            	<%if(session.getAttribute("admin") != null)
-						{
-							response.sendRedirect("admin_dashboard.jsp");
-						}
+            	<%
+            		if(session.getAttribute("admin") != null)
+					{
+						response.sendRedirect("admin_dashboard.jsp");
+					}
 				%>
 				
-				<%if(session.getAttribute("AdminErrorLogin") != null)
-						{
-							out.println((String)session.getAttribute("AdminErrorLogin"));
-						}
+				<%
+					if(session.getAttribute("AdminErrorLogin") != null)
+					{
+						out.println((String)session.getAttribute("AdminErrorLogin"));
+					}
 				%>
                 <span>Enter your username</span>
                 <input type="text" name="username" placeholder="Enter username" pattern="[A-Za-z0-9]+" title="Only letters and numbers are allowed" required>
@@ -51,40 +53,41 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <%
-            String username=request.getParameter("username");
-            String password=request.getParameter("password");
+		String username=request.getParameter("username");
+		String password=request.getParameter("password");
             
-            if(username==null && password==null){
-            }
+		if(username==null && password==null){
+		}
             
-            else{
-                try{
-                    Class.forName("com.mysql.jdbc.Driver");
-                    Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-                    PreparedStatement p=con.prepareStatement("select *from admin_details where name=? AND password=?");
-                    p.setString(1,username);
-                    p.setString(2,password);
-                    ResultSet r=p.executeQuery();
-                    if(r.next()){
-                    	session.setAttribute("admin","admin");
-        				response.sendRedirect("admin_dashboard.jsp");
-        %>
-            <script type="text/javascript">
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Login successfull',
-                    text: 'welcome to the Admin dashboard',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                  });
-            </script>		
+		else{
+            Connection con=null;
+			try{
+				con=DbConnection.getConnection();
+				PreparedStatement p=con.prepareStatement("select *from admin_details where name=? AND password=?");
+				p.setString(1,username);
+				p.setString(2,password);
+				ResultSet r=p.executeQuery();
+				if(r.next()){
+                    session.setAttribute("admin","admin");
+                    session.setAttribute("manage_owner","manage_owner");
+        			response.sendRedirect("admin_dashboard.jsp");
+	%>
+            	<script type="text/javascript">
+	                Swal.fire({
+                    	icon: 'success',
+                    	title: 'Login successfull',
+                    	text: 'welcome to the Admin dashboard',
+                    	confirmButtonColor: '#3085d6',
+                    	confirmButtonText: 'OK'
+                  	});
+            	</script>		
             
-			<!-- js script for page redirection -->
-			<script>
-        		setTimeout(function() {
-		           window.location.href = "admin_dashboard.jsp";
-	        	}, 2000); // 2000 milliseconds (2 seconds) delay
-			 </script>		
+				<!-- js script for page redirection -->
+				<script>
+	        		setTimeout(function() {
+			           window.location.href = "admin_dashboard.jsp";
+		        	}, 2000); // 2000 milliseconds (2 seconds) delay
+				 </script>		
         <%		}
                 else{
         %>
@@ -100,6 +103,9 @@
         <%      }
             }catch(Exception e){
                 out.println(e);
+            }finally{
+            	//close connection
+            	con.close();
             }
         }
         %>

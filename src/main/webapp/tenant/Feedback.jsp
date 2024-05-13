@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +15,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Box-Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
@@ -158,22 +158,25 @@
         /* padding: 20px; */
         margin-top: 50px;
         }
-        
-        
     </style>
 </head>
+
+<!-- Start of body -->
 <body>
 	<%
+		//check tenant already login or not
 		if(session.getAttribute("tenant")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	
+	<!-- Script for page redirection -->
 	<script>
 	    function redirectPage() {
-	        // Replace 'destination_page.html' with the actual URL where you want to redirect
 	        window.location.href = 'tenant_login.jsp';
 	    }
 	</script>
+	
     <!-- Navbar -->
     <div class="navbar">
         <a href="../home.jsp" class="logo"><i class='bx bx-home-heart'></i>House <br> Rental</a>
@@ -188,6 +191,7 @@
         <button onclick="redirectPage()" class="btn btn-success">Log out</button>
     </div>
  	
+ 	<!-- Feedback form -->
     <div class="container" style="margin-top:30px;">
     	<h2>Feedback Form</h2>
         <form action="Feedback.jsp" method="POST">
@@ -207,6 +211,7 @@
         </form>
       </div>      
       <%
+      		Connection con=null;
       		try{
       			Date currentDate = new Date();
       	      	String id = (String) session.getAttribute("id");
@@ -214,8 +219,9 @@
       			String email=request.getParameter("email");
       			String contact=request.getParameter("contact");
       			String subject=request.getParameter("subject");
-      	      	Class.forName("com.mysql.jdbc.Driver");
-      	      	Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+      	      	
+      			//open jdbc Connection
+      			con=DbConnection.getConnection();
       	      	PreparedStatement p=con.prepareStatement("insert into feedback_details(tenant_id,name,email,contact,subject,date) values(?,?,?,?,?,?)");
       	      	p.setString(1, id);
       	      	p.setString(2,name);
@@ -226,51 +232,57 @@
       	        p.execute();
       	%>
       	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-			        <!-- sweetalert for alert message -->
-			        <script type="text/javascript">
-			            Swal.fire({
-			                icon: 'success',
-			                title: 'Feedback successfull',
-			                text: 'Feedback submited Successfully..!!',
-			                confirmButtonColor: '#3085d6',
-			                confirmButtonText: 'OK'
-			              });
-			        </script>
-			       	<script>
-			        			setTimeout(function() {
-						            window.location.href = "Feedback.jsp";
-						        }, 2000); // 2000 milliseconds (2 seconds) delay
-					</script>
+			    <!-- sweetalert for alert message -->
+				<script type="text/javascript">
+			        Swal.fire({
+	                icon: 'success',
+					title: 'Feedback successfull',
+			        text: 'Feedback submited Successfully..!!',
+	                confirmButtonColor: '#3085d6',
+	                confirmButtonText: 'OK'
+	        	     });
+			    </script>
+       			<script>
+			        setTimeout(function() {
+			            window.location.href = "Feedback.jsp";
+					}, 2000); // 2000 milliseconds (2 seconds) delay
+				</script>
       	<%
       		}catch(Exception e){
       			System.out.println(e);
+      		}finally{
+      			//close connection
+      			con.close();
       		}
-      %>
+      	%>
       
       <%
-		    		try{
-		    			String id = (String) session.getAttribute("id");
-		    			Class.forName("com.mysql.jdbc.Driver");
-		    			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-		    			PreparedStatement p=con.prepareStatement("select *from tenant_details where tenant_id=?");
-		    			p.setString(1,id);
-		    			ResultSet r=p.executeQuery();
-		    			if(r.next()){
-		    				Date currentDate = new Date();
-		    		    	Class.forName("com.mysql.jdbc.Driver");
-		    				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-		    				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
-		    				p4.setString(1,r.getString("name"));
-		    				p4.setString(2,"tenant");
-		    				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
-		    				p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
-		    				p4.setString(5,"show feedback page");
-		    				p4.executeUpdate();
-		    			}
-		    		}catch(Exception e){
-		    			e.printStackTrace();
-		    		}
-
-            	%>
+      		Connection con1=null;
+		    try{
+		    	String id = (String) session.getAttribute("id");
+		    	//create jdbc connection
+				con1=DbConnection.getConnection();
+		    	PreparedStatement p=con1.prepareStatement("select *from tenant_details where tenant_id=?");
+				p.setString(1,id);
+		    	ResultSet r=p.executeQuery();
+				if(r.next()){
+		    		Date currentDate = new Date();
+		        	Class.forName("com.mysql.jdbc.Driver");
+		    		Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+		    		PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+		    		p4.setString(1,r.getString("name"));
+		    		p4.setString(2,"tenant");
+		    		p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
+		    		p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
+		    		p4.setString(5,"show feedback page");
+		    		p4.executeUpdate();
+		    	}
+		    }catch(Exception e){
+		    	e.printStackTrace();
+			}finally{
+				//close connection
+				con1.close();
+			}
+		%>
 </body>
 </html>

@@ -1,4 +1,5 @@
 import java.io.FileOutputStream;
+import house_renting_platform.DbConnection;
 import java.util.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,7 +44,7 @@ public class FileUploadServlet extends HttpServlet {
         String imgName = file.getSubmittedFileName();
         System.out.println("choose file: " + imgName);
         
-        String uploadPath="D:/Eclipse_workspace/house_renting_platform/src/main/webapp/uploads/"+imgName;
+        String uploadPath="house_renting_platform/src/main/webapp/uploads/"+imgName;
         System.out.println("upload path: "+uploadPath);
         
         try {
@@ -55,7 +56,7 @@ public class FileUploadServlet extends HttpServlet {
         	f.write(data);
         	is.close();
         	
-        	File tempFile = new File("D:/Eclipse_workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/work/Catalina/localhost/house_renting_platform/upload_bb30cf2c_6f9d_4296_acf7_517051f46847_00000005.tmp");
+        	File tempFile = new File("house_renting_platform/upload_bb30cf2c_6f9d_4296_acf7_517051f46847_00000005.tmp");
 
         	if (tempFile.exists()) {
         	    boolean deleted = tempFile.delete();
@@ -67,8 +68,7 @@ public class FileUploadServlet extends HttpServlet {
         	}
         	
         	//insert data into db
-        	Class.forName("com.mysql.jdbc.Driver");
-        	Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+        	Connection con=DbConnection.getConnection();
         	PreparedStatement p=con.prepareStatement("insert into house_details(owner_id,address,square_footage,num_of_bedrooms,num_of_bathrooms,rent_of_house,house_type,status,img,request,area) values(?,?,?,?,?,?,?,?,?,?,?)");
         	p.setInt(1, owner_id);
         	p.setString(2, address);
@@ -83,9 +83,7 @@ public class FileUploadServlet extends HttpServlet {
         	p.setString(11, area);
         	p.execute();
         	
-        	Class.forName("com.mysql.jdbc.Driver");
-			Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-			PreparedStatement p1=con.prepareStatement("select *from owner_details where owner_id=?");
+        	PreparedStatement p1=con.prepareStatement("select *from owner_details where owner_id=?");
 			p1.setInt(1,owner_id);
 			ResultSet r=p1.executeQuery();
 			if(r.next()){
@@ -101,6 +99,7 @@ public class FileUploadServlet extends HttpServlet {
 				p4.executeUpdate();
 			}
         	
+			con.close();
         	response.setContentType("text/html");
         	PrintWriter out=response.getWriter();
         	out.println("<script src=\"https://cdn.jsdelivr.net/npm/sweetalert2@10\"></script>\r\n");

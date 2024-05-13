@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +31,13 @@
     </style>
 </head>
 <body>
-	        <%
-					if(session.getAttribute("admin") == null)									
-					{
-						response.sendRedirect("error.jsp");							
-					}
-			%>
+	<%
+		//check admin already login or not
+		if(session.getAttribute("admin") == null)									
+		{
+			response.sendRedirect("error.jsp");							
+		}
+	%>
     <nav class="navbar navbar-expand-lg" style="background-color: #2288ff;">
         <div class="container-fluid">
             <a class="navbar-brand text-light" href="../home.html" style="margin-left: 20px;"><i class='bx bx-home-heart'></i> House Renting Platform</a>
@@ -54,9 +56,9 @@
     <form action="update_tenant.jsp" method="POST">
         <%
             int id = Integer.parseInt(request.getParameter("id"));
+        	Connection con=null; 
             try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+                con = DbConnection.getConnection();
                 PreparedStatement p = con.prepareStatement("select * from tenant_details where tenant_id=?");
                 p.setInt(1, id);
                 ResultSet r = p.executeQuery();
@@ -96,11 +98,14 @@
         </div>
         <br>
         <%
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    %>
+		        }
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }finally{
+		    	//close connection
+		    	con.close();
+		    }
+	    %>
     <input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Update">
 </form>
 <br><br><br>
@@ -113,11 +118,10 @@
     String gender = request.getParameter("gender");
     String caste = request.getParameter("caste");
     String adharno = request.getParameter("adharno");
-
+    Connection con1=null;
     try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-        PreparedStatement p = con.prepareStatement("update tenant_details set name=?, password=?, contact_no=?, email_id=?, gender=?, cast=?, adharno=? where tenant_id=?");
+        con1 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+        PreparedStatement p = con1.prepareStatement("update tenant_details set name=?, password=?, contact_no=?, email_id=?, gender=?, cast=?, adharno=? where tenant_id=?");
         p.setString(1, t_name);
         p.setString(2, password);
         p.setString(3, contactNo);
@@ -131,6 +135,8 @@
         //response.sendRedirect("manage_tenant.jsp");
     } catch (Exception e) {
         e.printStackTrace();
+    }finally{
+    	con1.close();
     }
 %>
 </body>

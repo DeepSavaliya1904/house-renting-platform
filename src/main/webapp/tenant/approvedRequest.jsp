@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="house_renting_platform.DbConnection"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,9 +211,9 @@
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	<!-- Script for page redirection -->
 	<script>
 	    function redirectPage() {
-	        // Replace 'destination_page.html' with the actual URL where you want to redirect
 	        window.location.href = 'tenant_login.jsp';
 	    }
 	</script>
@@ -229,6 +230,7 @@
         </ul>
         <button onclick="redirectPage()" class="btn btn-primary" style="margin-top:2px;">Log out</button>
     </div>
+    <!-- Body -->
     <div class="body" style="padding-left: 55px; padding-right: 65px;">
         <table class="table" style="margin-top: 60px;">
             <thead class="table-dark">
@@ -246,23 +248,30 @@
             </thead>
             <tbody>
 				<%
+					Connection con1=null;
 					try{
 						String id = (String) session.getAttribute("id");
-						Class.forName("com.mysql.jdbc.Driver");
-						Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+						con1=DbConnection.getConnection();
+						
+						//fetch data from renting_details table
 						PreparedStatement p1=con1.prepareStatement("select *from renting_details where tenant_id=?");
 						p1.setString(1,id);
 						ResultSet r1=p1.executeQuery();
 						while(r1.next()){
 					        if (("accept".equals(r1.getString("request")))) {
+					        	
+					        	//fetch data from owner_details table
 					        	PreparedStatement p2=con1.prepareStatement("select *from owner_details where owner_id=?");
 					        	p2.setString(1,r1.getString("owner_id"));
 					        	ResultSet r2=p2.executeQuery();
 					        	while(r2.next()){
+					        		
+					        		//fetch data from house_details table
 					        		PreparedStatement p3=con1.prepareStatement("select *from house_details where house_id=?");
 					        		p3.setString(1,r1.getString("house_id"));
 					        		ResultSet r3=p3.executeQuery();
 					        		while(r3.next()){
+					        			//print details into the table
 					%>
 				<tr>
 					<td><%out.println(r1.getString(1)); %></td>		
@@ -288,23 +297,27 @@
 									}
 						}catch(Exception e){
 							out.println(e);
-						}
+						}finally{
+			            	con1.close();
+			            }
 					%>              
             </tbody>
           </table>
           <%
+          			Connection con=null;
 		    		try{
+		    			//create connection
 		    			String id = (String) session.getAttribute("id");
 		    			Class.forName("com.mysql.jdbc.Driver");
-		    			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+		    			con=DbConnection.getConnection();
+		    			
+		    			//fetch data from tenant_details table
 		    			PreparedStatement p=con.prepareStatement("select *from tenant_details where tenant_id=?");
 		    			p.setString(1,id);
 		    			ResultSet r=p.executeQuery();
 		    			if(r.next()){
 		    				Date currentDate = new Date();
-		    		    	Class.forName("com.mysql.jdbc.Driver");
-		    				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-		    				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+		    		    	PreparedStatement p4=con.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
 		    				p4.setString(1,r.getString("name"));
 		    				p4.setString(2,"tenant");
 		    				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
@@ -314,6 +327,9 @@
 		    			}
 		    		}catch(Exception e){
 		    			e.printStackTrace();
+		    		}finally{
+		    			//close connection
+		    			con.close();
 		    		}
 
             	%>

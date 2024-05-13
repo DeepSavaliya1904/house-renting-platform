@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,9 +47,9 @@
                 </p>
             </form>
         </div>
-	<div class="login-image">
-		<img src="img/tenant_login.jpg" width="600" height="400">
-	</div>
+		<div class="login-image">
+			<img src="img/tenant_login.jpg" width="600" height="400">
+		</div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <% 
@@ -61,13 +62,15 @@
         String adharno=request.getParameter("adharno");
         
         if(username==null && password==null && contact==null && email==null && gender==null && cast==null && adharno==null){
-            
+            out.print("invalid operation");
         }
         
         else{
+        	Connection con=null;
             try{
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+                con=DbConnection.getConnection();
+                
+                //add tenant details
                 PreparedStatement p=con.prepareStatement("insert into tenant_details(name,password,contact_no,email_id,gender,cast,adharno) values(?,?,?,?,?,?,?)");
                 p.setString(1,username);
                 p.setString(2,password);
@@ -77,7 +80,7 @@
                 p.setString(6,cast);
                 p.setString(7,adharno);
                 p.execute();%>
-            
+                   
             <script type="text/javascript">
                 Swal.fire({
                     icon: 'success',
@@ -86,6 +89,7 @@
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                   });
+			<!-- script for page redirection-->
             </script>
             	<script>
         			setTimeout(function() {
@@ -95,6 +99,9 @@
                 
         <%	}catch(Exception e){
                 out.println(e);
+            }finally{
+            	//close connection
+            	con.close();
             }
         }
     %>

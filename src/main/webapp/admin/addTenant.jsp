@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,6 +32,7 @@
 </head>
 <body>
 	<%
+		//check admin already login or not
 		if(session.getAttribute("admin")==null){
 			response.sendRedirect("error.jsp");
 		}
@@ -80,35 +82,37 @@
             <label for="adharno">Adhar no</label>
         </div>
         <br>
-    <input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Add">
-</form>
-<br><br><br>
-<%
-    String t_name = request.getParameter("name");
-    String password = request.getParameter("password");
-    String contactNo = request.getParameter("contactNo");
-    String email = request.getParameter("email");
-    String gender = request.getParameter("gender");
-    String caste = request.getParameter("caste");
-    String adharno = request.getParameter("adharno");
-
-    try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-        PreparedStatement p = con.prepareStatement("insert into tenant_details(name,password,contact_no,email_id,gender,cast,adharno) values(?,?,?,?,?,?,?)");
-        p.setString(1, t_name);
-        p.setString(2, password);
-        p.setString(3, contactNo);
-        p.setString(4, email);
-        p.setString(5, gender);
-        p.setString(6, caste);
-        p.setString(7, adharno);
-        p.execute();
-		
-        response.sendRedirect("manage_tenant.jsp");
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-%>
+    	<input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Add">
+	</form>
+	<br><br><br>
+	<%
+	    String t_name = request.getParameter("name");
+	    String password = request.getParameter("password");
+	    String contactNo = request.getParameter("contactNo");
+	    String email = request.getParameter("email");
+	    String gender = request.getParameter("gender");
+	    String caste = request.getParameter("caste");
+	    String adharno = request.getParameter("adharno");
+		Connection con=null;
+	    try {
+	        con =DbConnection.getConnection();
+	        PreparedStatement p = con.prepareStatement("insert into tenant_details(name,password,contact_no,email_id,gender,cast,adharno) values(?,?,?,?,?,?,?)");
+	        p.setString(1, t_name);
+	        p.setString(2, password);
+	        p.setString(3, contactNo);
+	        p.setString(4, email);
+	        p.setString(5, gender);
+	        p.setString(6, caste);
+	        p.setString(7, adharno);
+	        p.execute();
+			
+	        response.sendRedirect("manage_tenant.jsp");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }finally{
+	    	//close connection
+	    	con.close();
+	    }
+	%>
 </body>
 </html>

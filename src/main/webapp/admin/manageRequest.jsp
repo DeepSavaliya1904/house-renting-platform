@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <%! int id = 0; %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,12 +13,13 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	</head>
 	<body>
-	        <%
-					if(session.getAttribute("admin") == null)									
-					{
-						response.sendRedirect("error.jsp");							
-					}
-			%>
+		<%
+			//check admin already login or not
+			if(session.getAttribute("admin") == null)									
+			{
+				response.sendRedirect("error.jsp");							
+			}
+		%>
 		<div class="sidebar">
 			<div class="logo"></div>
 			<ul class="menu">
@@ -90,9 +92,9 @@
             </thead>
             <tbody>
 				<%
+					Connection con=null; 
 					try{
-						Class.forName("com.mysql.jdbc.Driver");
-						Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+						con=DbConnection.getConnection();
 						PreparedStatement p=con.prepareStatement("select *from house_details");
 						ResultSet r=p.executeQuery();
 						while(r.next()){
@@ -102,7 +104,7 @@
 					        	ResultSet r1=p3.executeQuery();
 					        	while(r1.next()){
 					        	
-					%>
+				%>
 				<tr>
 					<td><%out.println(r.getString(1)); %></td>		
 					<td><%out.println(r1.getString(2)); %></td>
@@ -128,11 +130,12 @@
 						}
 						}catch(Exception e){
 							out.println(e);
+						}finally{
+							con.close();
 						}
-					%>              
+				%>              
             </tbody>
           </table>
 		</div>
-
 	</body>
 </html>

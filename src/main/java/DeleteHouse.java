@@ -1,4 +1,4 @@
-
+import house_renting_platform.DbConnection;
 import java.sql.*;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,9 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Servlet implementation class DeleteHouse
- */
 @WebServlet("/DeleteHouse")
 public class DeleteHouse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -43,9 +40,9 @@ public class DeleteHouse extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out=response.getWriter();
 		int id=Integer.parseInt(request.getParameter("id"));
+		Connection con=null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+			con=DbConnection.getConnection();
 			PreparedStatement p=con.prepareStatement("delete from house_details where house_id=?");
 			p.setInt(1, id);
 			p.execute();
@@ -62,6 +59,7 @@ public class DeleteHouse extends HttpServlet {
 			out.println("<script>");
 			out.println("    window.location.href = \"owner/manageHouse.jsp\";\r\n");
 			out.println("</script>");
+			con.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

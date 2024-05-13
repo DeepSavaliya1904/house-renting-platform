@@ -1,4 +1,4 @@
-
+import house_renting_platform.DbConnection;
 
 import java.sql.*;
 import java.io.IOException;
@@ -53,8 +53,7 @@ public class TenantOperations extends HttpServlet {
 		int id=Integer.parseInt(request.getParameter("id"));
 		out.println(id);
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+			Connection con=DbConnection.getConnection();
 			PreparedStatement p=con.prepareStatement("delete from tenant_details where tenant_id=?");
 			p.setInt(1, id);
 			p.execute();
@@ -71,6 +70,7 @@ public class TenantOperations extends HttpServlet {
 			out.println("<script>");
 			out.println("    window.location.href = \"admin/manage_tenant.jsp\";\r\n");
 			out.println("</script>");
+			con.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,16 +220,19 @@
 </head>
 <body>
 	<%
+		//check tenant already login or not
 		if(session.getAttribute("tenant")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	<!-- Script for page redirection -->
 	<script>
 	    function redirectPage() {
-	        // Replace 'destination_page.html' with the actual URL where you want to redirect
 	        window.location.href = 'tenant_logout.jsp';
 	    }
 	</script>
+	
+	<!-- navbar -->
     <div class="navbar">
         <a href="../home.jsp" class="logo"><i class='bx bx-home-heart'></i>House <br> Rental</a>
         <ul class="navlink" style="width:120%;">
@@ -243,17 +247,18 @@
     </div>
     <div class="heading"><h1>House Details</h1></div>
 
+	<!-- properties -->
     <div class="properties">
 		<%
+			Connection con=null;
 			try{
+				//create jdbc connection
 				String house_id=request.getParameter("house_id");
 				String owner_id=request.getParameter("owner_id");
-				Class.forName("com.mysql.jdbc.Driver");
-				Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-				//PreparedStatement p=con.prepareStatement("select *from house_details where house_id=");
-				//p.setString(1,house_id);
-				Statement s=con.createStatement();
-				ResultSet r=s.executeQuery("select *from house_details where house_id='"+house_id+"'");
+				con=DbConnection.getConnection();
+				PreparedStatement p=con.prepareStatement("select *from house_details where house_id=?");
+				p.setString(1,house_id);
+				ResultSet r=p.executeQuery();
 				if(r.next()){
 		%>
         <div class="image"><img src="../uploads/<%= r.getString("img") %>" alt="HOUSE IMAGE" style="width: 500px ; height: 380px; margin-top: 50px; margin-left: 50px;"></div>
@@ -278,10 +283,6 @@
                 </div>
 
 				<%
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-					//PreparedStatement p1=con1.prepareStatement("select *from owner_details where owner_id=?");
-					//p1.setString(1,owner_id);
 					Statement s1=con.createStatement();
 					ResultSet r1=s1.executeQuery("select *from owner_details where owner_id='"+owner_id+"'");
 					if(r1.next()){
@@ -309,6 +310,9 @@
     <%}
 			}catch(Exception e){
 				out.println(e);
+			}finally{
+				//close connection
+				con.close();
 			}
 		%>	
 </body>

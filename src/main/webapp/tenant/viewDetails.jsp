@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -223,12 +224,13 @@
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	<!-- script for page redirection -->
 	<script>
 	    function redirectPage() {
-	        // Replace 'destination_page.html' with the actual URL where you want to redirect
 	        window.location.href = 'tenant_logout.jsp';
 	    }
 	</script>
+	<!-- navbar -->
     <div class="navbar">
         <a href="Index.html" class="logo"><i class='bx bx-home-heart'></i>House <br> Rental</a>
         <ul class="navlink" style="width:120%;">
@@ -243,13 +245,16 @@
     </div>
     <div class="heading"><h1>House Details</h1></div>
 
+	<!-- properties -->
     <div class="properties">
 		<%
+			Connection con=null;
 			try{
 				String house_id=request.getParameter("house_id");
 				String owner_id=request.getParameter("owner_id");
-				Class.forName("com.mysql.jdbc.Driver");
-				Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+				con=DbConnection.getConnection();
+				
+				//select house details
 				PreparedStatement p=con.prepareStatement("select *from house_details where house_id=?");
 				p.setString(1,house_id);
 				ResultSet r=p.executeQuery();
@@ -277,9 +282,8 @@
                 </div>
 
 				<%
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-					PreparedStatement p1=con1.prepareStatement("select *from owner_details where owner_id=?");
+					//select owner details
+					PreparedStatement p1=con.prepareStatement("select *from owner_details where owner_id=?");
 					p1.setString(1,owner_id);
 					ResultSet r1=p1.executeQuery();
 					if(r1.next()){
@@ -307,6 +311,9 @@
     <%}
 			}catch(Exception e){
 				out.println(e);
+			}finally{
+				//close connection
+				con.close();
 			}
 		%>	
 </body>

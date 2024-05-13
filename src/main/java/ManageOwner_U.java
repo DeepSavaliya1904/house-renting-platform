@@ -1,4 +1,4 @@
-
+import house_renting_platform.DbConnection;
 import java.sql.*;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -45,8 +45,7 @@ public class ManageOwner_U extends HttpServlet {
 	    String age = request.getParameter("age");
 
 	    try {
-	        Class.forName("com.mysql.jdbc.Driver");
-	        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+	        Connection con = DbConnection.getConnection();
 	        PreparedStatement p = con.prepareStatement("update owner_details set name=?, password=?, contact_no=?, email_id=?, age=? where owner_id=?");
 	        p.setString(1, t_name);
 	        p.setString(2, password);
@@ -55,7 +54,7 @@ public class ManageOwner_U extends HttpServlet {
 	        p.setString(5, age);
 	        p.setString(6, request.getParameter("o_id"));
 	        p.executeUpdate();
-			
+			con.close();
 	        response.sendRedirect("admin/manage_owner.jsp");
 	    } catch (Exception e) {
 	        e.printStackTrace();

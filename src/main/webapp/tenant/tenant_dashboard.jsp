@@ -2,8 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.json.JSONArray, org.json.JSONObject" %>
-
+<%@ page import="house_renting_platform.DbConnection"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -173,6 +172,8 @@
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	
+	<!-- script for page redirection -->
 	<script>
 	    function redirectPage() {
 	        window.location.href = 'tenant_logout.jsp';
@@ -196,30 +197,35 @@
             <br><br><br><br><br><br><br><br>
             <h1>Welcome 
             	<%
-    		try{
-    			String id = (String) session.getAttribute("id");
-    			Class.forName("com.mysql.jdbc.Driver");
-    			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-    			//PreparedStatement p=con.prepareStatement("select *from tenant_details where tenant_id=?");
-    			//p.setString(1,id);
-    			Statement s=con.createStatement();
-    			ResultSet r=s.executeQuery("select *from tenant_details where tenant_id='"+id+"'");
-    			if(r.next()){
-    				out.println(r.getString(2));
-    				Date currentDate = new Date();
-    		    	Class.forName("com.mysql.jdbc.Driver");
-    				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-    				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
-    				p4.setString(1,r.getString("name"));
-    				p4.setString(2,"tenant");
-    				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
-    				p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
-    				p4.setString(5,"Visit Tenant Homepage");
-    				p4.executeUpdate();
-    			}
-    		}catch(Exception e){
-    			e.printStackTrace();
-    		}
+            		Connection con=null;
+    				try{
+    					//create jdbc connection
+    					String id = (String) session.getAttribute("id");
+    	    			con=DbConnection.getConnection();
+    	    
+    	    			//select tenant details
+    					PreparedStatement p=con.prepareStatement("select *from tenant_details where tenant_id=?");
+    					p.setString(1,id);
+    					ResultSet r=p.executeQuery();
+    					if(r.next()){
+    						out.println(r.getString(2));
+    						Date currentDate = new Date();
+    						
+    						//track activity
+		    				PreparedStatement p4=con.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+    						p4.setString(1,r.getString("name"));
+    						p4.setString(2,"tenant");
+    						p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
+    						p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
+    						p4.setString(5,"Visit Tenant Homepage");
+    						p4.executeUpdate();
+    					}
+    				}catch(Exception e){
+    					e.printStackTrace();
+    				}finally{
+    					//close connection
+    					con.close();
+    				}
 
             	%>
             
@@ -229,8 +235,8 @@
                 Browse through a diverse range of listings, find the perfect space, and secure 
                 your next living experience seamlessly.</p>
                 
-        <a class="btn btn-success" href="properties.jsp">View More</a>
-            </div>
+        	<a class="btn btn-success" href="properties.jsp">View More</a>
+		</div>
     </section>
 </body>
 </html>

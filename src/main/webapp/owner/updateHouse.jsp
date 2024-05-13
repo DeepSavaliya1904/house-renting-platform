@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import = "java.io.*,java.util.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 
 <head>
@@ -18,9 +19,10 @@
         }
     </style>
 </head>
-
+<!--Body start -->
 <body>
 	<%
+		//check owner already login or not
     	String id = (String) session.getAttribute("id");
 		if(session.getAttribute("owner")==null){
 			response.sendRedirect("error.jsp");
@@ -57,13 +59,13 @@
 				</a>
 			</li>
 			</ul>
-		<ul class="side-menu">
-			<li style="margin-left: -20px;">
-				<a href="owner_logout.jsp" class="logout">
-					<i class='bx bxs-log-out-circle' ></i>
-					<span class="text">Logout</span>
-				</a>
-			</li>
+			<ul class="side-menu">
+				<li style="margin-left: -20px;">
+					<a href="owner_logout.jsp" class="logout">
+						<i class='bx bxs-log-out-circle' ></i>
+						<span class="text">Logout</span>
+					</a>
+				</li>
 			</ul>
 	</section>
 	<script src="script.js"></script>
@@ -80,8 +82,7 @@
 			<label for="switch-mode" class="switch-mode"></label>
 			<h5>
 				<%
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+					Connection con=DbConnection.getConnection();
 					PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
 					p.setString(1,id);
 					ResultSet r=p.executeQuery();
@@ -110,9 +111,7 @@
 				<%
 					try{
 						String h_id=request.getParameter("id");
-						Class.forName("com.mysql.jdbc.Driver");
-						Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-						PreparedStatement p1=con1.prepareStatement("select *from house_details where house_id=?");
+						PreparedStatement p1=con.prepareStatement("select *from house_details where house_id=?");
 						p1.setString(1,h_id);
 						ResultSet r1=p1.executeQuery();
 						while(r1.next()){
@@ -156,30 +155,31 @@
             </form>	
 		</main>
 	</section>
-	 			  <%
-    				    String house_id = request.getParameter("house_id");
-    				    String address = request.getParameter("address");
-    				    String Sqft = request.getParameter("Sqft");
-    				    String bathrooms = request.getParameter("bathrooms");
-    				    String bedrooms = request.getParameter("bedrooms");
-    				    String rent = request.getParameter("rent");
-    				    String type = request.getParameter("type");
-    				    try {
-    				        Class.forName("com.mysql.jdbc.Driver");
-    				        Connection con3 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-    				        PreparedStatement p3 = con3.prepareStatement("update house_details set address=?,square_footage=?,num_of_bathrooms=?,num_of_bedrooms=?,rent_of_house=?,house_type=? where house_id=?");
-    				        p3.setString(1, address);
-    				        p3.setString(2, Sqft);
-    				        p3.setString(3, bathrooms);
-    				        p3.setString(4, bedrooms);
-    				        p3.setString(5, rent);
-    				        p3.setString(6, type);
-    				        p3.setString(7, house_id);
-    				        p3.executeUpdate();
-    				        //response.sendRedirect("manageHouse.jsp");
-    				   	 } catch (Exception e) {
-    				        e.printStackTrace();
-    				    }
-    				%>	
+	 		<%
+    			String house_id = request.getParameter("house_id");
+    			String address = request.getParameter("address");
+    			String Sqft = request.getParameter("Sqft");
+    			String bathrooms = request.getParameter("bathrooms");
+    			String bedrooms = request.getParameter("bedrooms");
+    			String rent = request.getParameter("rent");
+    			String type = request.getParameter("type");
+    			try {
+    				//update house details
+    				PreparedStatement p3 = con.prepareStatement("update house_details set address=?,square_footage=?,num_of_bathrooms=?,num_of_bedrooms=?,rent_of_house=?,house_type=? where house_id=?");
+    				p3.setString(1, address);
+    				p3.setString(2, Sqft);
+    				p3.setString(3, bathrooms);
+    		        p3.setString(4, bedrooms);
+    		        p3.setString(5, rent);
+    				p3.setString(6, type);
+    				p3.setString(7, house_id);
+    				p3.executeUpdate();
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}finally{
+    				//close connection
+    			}
+    			con.close();
+    		%>	
 </body>
 </html>

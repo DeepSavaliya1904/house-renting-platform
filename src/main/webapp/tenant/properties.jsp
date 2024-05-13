@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,7 +14,6 @@
     <!-- Box-Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-	
 	<style type="text/css">
 			*{
 			    margin: 0;
@@ -302,13 +302,14 @@
 </head>
 <body>
 	<%
+		//check that tenant already login or not
 		if(session.getAttribute("tenant")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
+	<!-- Script for page redirection -->
 	<script>
 	    function redirectPage() {
-	        // Replace 'destination_page.html' with the actual URL where you want to redirect
 	        window.location.href = 'tenant_logout.jsp';
 	    }
 	</script>
@@ -325,67 +326,74 @@
         </ul>
         <button onclick="redirectPage()" class="btn btn-primary">Log out</button>
     </div>
-        <section class="properties" id="properties">
+	<section class="properties" id="properties">
         <div style="display:flex; margin-left:60vh; margin-top:20px;" class="search-item">
 	        <form class="d-flex" action="#" method="POST">
 	        	<input type="search" placeholder="search your nearest area" id="searchInput" class="form-control me-2 border-success" style="width:600px;" name="search">
 	        </form>
         </div>
-                <!-- menu -->
-                <div class="menu" id="Menu" style="margin-top:-30px">
-                    <div class="menu_box">
-                		<%
-						    try {
-						        Class.forName("com.mysql.jdbc.Driver");
-						        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-						        PreparedStatement p;
-						        p = con.prepareStatement("select * from house_details where request=? and status=?");
-						        p.setString(1, "accept");
-						        p.setString(2, "available");
-						        ResultSet r = p.executeQuery();
-						        while (r.next()) {
-						%>
-						    <div class="menu_card" data-area="<%= r.getString("area") %>">
-						        <div class="menu_image">
-									<img src="../uploads/<%= r.getString("img")%>">
-						        </div>
-						        <div class="small_card">
-						            <i class="fa-solid fa-heart"></i>
-						        </div>
-						        <div class="menu_info">
-						            <h2 style="margin-left:40px;">Type: <%= r.getString("house_type") %></h2>
-						            <ul>
-						                <li><%= r.getString("num_of_bedrooms") %> Bedrooms</li>
-						                <li><%= r.getString("num_of_bathrooms") %> Bathrooms</li>
-						                <li><%= r.getString("square_footage") %> sqft</li>
-						            </ul>
-						            <p>
-						                <%= r.getString("address") %>
-						            </p>
-						            <h3>$<%= r.getString("rent_of_house") %>/month</h3>
-						            <form action="propertiesDetails.jsp" method="get">
-						                <input type="hidden" name="house_id" value="<%= r.getString("house_id") %>">
-						                <input type="hidden" name="owner_id" value="<%= r.getString("owner_id") %>">
-						                <input type="hidden" name="image" value="<%= r.getString("img") %>">
-						                <input type="submit" value="Take On Rent" class="menu_btn">
-						            </form>
-						        </div>
-						    </div>
-						<%
-						        }
-						    } catch (Exception e) {
-						        e.printStackTrace();
-						    }
-						%>
-						<script>
-    						document.getElementById("searchInput").addEventListener("input", function () {
-        					searchProducts();
-    					});
-
-    					function searchProducts() {
-        					const searchQuery = document.getElementById("searchInput").value.toLowerCase();
-        					const products = document.querySelectorAll(".menu_card");
-
+		
+		 <!-- menu -->
+		<div class="menu" id="Menu" style="margin-top:-30px">
+			<div class="menu_box">
+                <%
+                	Connection con=null;
+					try {
+						//create jdbc connection
+						con = DbConnection.getConnection();
+						PreparedStatement p;
+						p = con.prepareStatement("select * from house_details where request=? and status=?");
+						p.setString(1, "accept");
+						p.setString(2, "available");
+						ResultSet r = p.executeQuery();
+						while (r.next()) {
+							//print details
+				%>
+					<div class="menu_card" data-area="<%= r.getString("area") %>">
+						<div class="menu_image">
+							<img src="../uploads/<%= r.getString("img")%>">
+						</div>
+						<div class="small_card">
+							<i class="fa-solid fa-heart"></i>
+						</div>
+						<div class="menu_info">
+							<h2 style="margin-left:40px;">Type: <%= r.getString("house_type") %></h2>
+							<ul>
+								<li><%= r.getString("num_of_bedrooms") %> Bedrooms</li>
+								<li><%= r.getString("num_of_bathrooms") %> Bathrooms</li>
+								<li><%= r.getString("square_footage") %> sqft</li>
+							</ul>
+							<p>
+								<%= r.getString("address") %>
+							</p>
+							<h3>$<%= r.getString("rent_of_house") %>/month</h3>
+							<form action="propertiesDetails.jsp" method="get">
+								<input type="hidden" name="house_id" value="<%= r.getString("house_id") %>">
+								<input type="hidden" name="owner_id" value="<%= r.getString("owner_id") %>">
+								<input type="hidden" name="image" value="<%= r.getString("img") %>">
+								<input type="submit" value="Take On Rent" class="menu_btn">
+							</form>
+						</div>
+					</div>
+					<%
+					        }
+						} catch (Exception e) {
+							e.printStackTrace();
+					    }finally{
+					    	//close connection
+					    	con.close();
+					    }
+					%>
+					
+					<!-- script for search house according to nearest area -->
+					<script>
+    					document.getElementById("searchInput").addEventListener("input", function () {
+        				searchProducts();
+    				});
+							
+    				function searchProducts() {
+        				const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+        				const products = document.querySelectorAll(".menu_card");
 				        products.forEach(function(product) {
             				const area = product.getAttribute("data-area").toLowerCase();
 
@@ -396,23 +404,24 @@
             				}
 	        				});
 	    				}
-						</script>
-						                    	
-                     </div>
-                </div>        
+					</script>
+				</div>
+			</div>        
                 <%
+                	Connection con1=null;
 		    		try{
+		    			//create connection
 		    			String id = (String) session.getAttribute("id");
-		    			Class.forName("com.mysql.jdbc.Driver");
-		    			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+		    			con1=DbConnection.getConnection();
+		    			
+		    			//fetch tenant details from tenant_details table
 		    			PreparedStatement p=con.prepareStatement("select *from tenant_details where tenant_id=?");
 		    			p.setString(1,id);
 		    			ResultSet r=p.executeQuery();
 		    			if(r.next()){
+		    				//track activity
 		    		    	Date currentDate = new Date();
-		    		    	Class.forName("com.mysql.jdbc.Driver");
-		    				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-		    				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+		    		    	PreparedStatement p4=con1.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
 		    				p4.setString(1,r.getString("name"));
 		    				p4.setString(2,"tenant");
 		    				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
@@ -422,11 +431,11 @@
 		    			}
 		    		}catch(Exception e){
 		    			e.printStackTrace();
+		    		}finally{
+		    			//close connection
+		    			con1.close();
 		    		}
-
-            	%>
-                
-				                
+            	%>				                
     </section>
 </body>
 </html>

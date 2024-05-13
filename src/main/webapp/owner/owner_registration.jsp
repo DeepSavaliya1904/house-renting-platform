@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,10 +52,9 @@
 			String contact=request.getParameter("contact_no");
 			String email=request.getParameter("email_id");
 			String age=request.getParameter("age");
-			
+			Connection con=null;
 				try{
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+					con=DbConnection.getConnection();
 					PreparedStatement p=con.prepareStatement("insert into owner_details(name,password,contact_no,email_id,age) values(?,?,?,?,?)");
 					p.setString(1,username);
 					p.setString(2,password);
@@ -80,9 +80,13 @@
 			        }, 2000); // 2000 milliseconds (2 seconds) delay
 			    </script>
 					
-			<%	}catch(Exception e){
+			<%	
+				}catch(Exception e){
 					System.out.println(e);
+				}finally{
+					//close connection
+					con.close();
 				}
-		%>
+			%>
 </body>
 </html>

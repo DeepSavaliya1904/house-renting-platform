@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,6 +32,7 @@
 </head>
 <body>
 	<%
+		//check admin already login or not
 		if(session.getAttribute("admin")==null){
 			response.sendRedirect("error.jsp");
 		}
@@ -72,31 +74,32 @@
             <label for="ager">age</label>
         </div>
         <br>
-    <input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Add">
-</form>
-<br><br><br>
-<%
-    String t_name = request.getParameter("name");
-    String password = request.getParameter("password");
-    String contactNo = request.getParameter("contactNo");
-    String email = request.getParameter("email");
-    String age = request.getParameter("age");
-
-    try {
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
-        PreparedStatement p = con.prepareStatement("insert into owner_details(name,password,contact_no,email_id,age) values(?,?,?,?,?)");
-        p.setString(1, t_name);
-        p.setString(2, password);
-        p.setString(3, contactNo);
-        p.setString(4, email);
-        p.setString(5, age);
-        p.execute();
-		
-        response.sendRedirect("manage_owner.jsp");
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-%>
+   		<input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Add">
+	</form>
+	<br><br><br>
+	<%
+	    String t_name = request.getParameter("name");
+	    String password = request.getParameter("password");
+	    String contactNo = request.getParameter("contactNo");
+	    String email = request.getParameter("email");
+	    String age = request.getParameter("age");
+	    Connection con=null;
+	    try {
+	        con =DbConnection.getConnection();
+	        PreparedStatement p = con.prepareStatement("insert into owner_details(name,password,contact_no,email_id,age) values(?,?,?,?,?)");
+	        p.setString(1, t_name);
+	        p.setString(2, password);
+	        p.setString(3, contactNo);
+	        p.setString(4, email);
+	        p.setString(5, age);
+	        p.execute();
+	        response.sendRedirect("manage_owner.jsp");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }finally{
+	    	//close connection
+	    	con.close();
+	    }
+	%>
 </body>
 </html>

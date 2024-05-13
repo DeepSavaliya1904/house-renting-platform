@@ -1,6 +1,6 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="org.json.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <head>
 	<meta charset="UTF-8">
@@ -9,36 +9,38 @@
 	<link rel="stylesheet" href="viewProfile.css">
 	<title>Owner Dashboard</title>
 </head>
-
 <body>
 	<%
+		//check owner already login or not
 		if(session.getAttribute("owner")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
-	<%
+	<%	
+		Connection con=null;
 		try{
 			String id = (String) session.getAttribute("id");
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+			//create connection
+			con=DbConnection.getConnection();
 			PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
 			p.setString(1,id);
-			ResultSet r=p.executeQuery();
+			ResultSet r=p.executeQuery(); //execute query
 			if(r.next()){
-				
+				//track activity
 		    	Date currentDate = new Date();
-		    	Class.forName("com.mysql.jdbc.Driver");
-				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+		    	PreparedStatement p4=con.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
 				p4.setString(1,r.getString("name"));
 				p4.setString(2,"owner");
 				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
 				p4.setString(4,new java.text.SimpleDateFormat("HH:mm:ss").format(currentDate));
 				p4.setString(5,"Visit Owner Dashboard");
-				p4.executeUpdate();
+				p4.executeUpdate(); //execute update
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally{
+			//close connection
+			con.close();
 		}
 	%>
 	<section id="sidebar">
@@ -94,14 +96,14 @@
 			<h4>
 				<%
 					String id = (String) session.getAttribute("id");
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con5=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+					Connection con5=DbConnection.getConnection();
 					PreparedStatement p5=con5.prepareStatement("select *from owner_details where owner_id=?");
 					p5.setString(1,id);
 					ResultSet r5=p5.executeQuery();
 					if(r5.next()){
 						out.println(r5.getString("name"));
 					}
+					con5.close();
 				%>
 			</h4>
 			<a href="#" class="profile">
@@ -138,8 +140,7 @@
 						<h3>
 							<%
 								String ans;
-								Class.forName("com.mysql.jdbc.Driver");
-								Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+								Connection con1=DbConnection.getConnection();
 								PreparedStatement p1=con1.prepareStatement("select count(*) as ans from house_details where owner_id=?");
 								p1.setString(1,id);
 								ResultSet r1=p1.executeQuery();
@@ -157,13 +158,13 @@
 					<span class="text">
 						<h3>
 							<%
+								Connection con2=null;
 								try{
 									out.println("0");
 									String ans2;
-									String owner_id=(String) session.getAttribute("id");
-									
-									Class.forName("com.mysql.jdbc.Driver");
-									Connection con2=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+									String owner_id=(String) session.getAttribute("id");//get session data
+									//create connection
+									con2=DbConnection.getConnection();
 									PreparedStatement p2=con2.prepareStatement("select count(*) as ans2 from house_details where status=? and owner_id=?");
 									p2.setString(1,"available");
 									p2.setString(2,owner_id);
@@ -173,6 +174,9 @@
 									}
 								}catch(Exception e){
 									System.out.println(e);
+								}finally{
+									//close connection
+									con2.close();
 								}
 							%>
 						</h3>
@@ -183,10 +187,10 @@
 					<i class='bx bx-git-pull-request' ></i>
 					<span class="text">
 						<h3><%
+							Connection con3=null;
 							try {
 							    String ans1;
-							    Class.forName("com.mysql.jdbc.Driver");
-							    Connection con3 = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+							    con3 = DbConnection.getConnection();
 							    PreparedStatement p3 = con3.prepareStatement("select count(*) as ans1 from house_details where request=? and owner_id=?");
 							    p3.setString(1, "pending");
 							    p3.setString(2, id);
@@ -194,9 +198,10 @@
 							    if (r3.next()) {
 							        out.println(r3.getString("ans1"));
 							    }
-							    con3.close();
 							} catch (Exception e) {
 							    out.println(e);
+							}finally{
+								con3.close();
 							}
 							%>
 
@@ -221,13 +226,12 @@
 						<tbody>
 							<%
 								String id1 = (String) session.getAttribute("id");
-								Class.forName("com.mysql.jdbc.Driver");
-								Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-								PreparedStatement p=con.prepareStatement("select *from renting_details where owner_id=?");
+								Connection con4=DbConnection.getConnection();
+								PreparedStatement p=con4.prepareStatement("select *from renting_details where owner_id=?");
 								p.setString(1,id1);
-							ResultSet r=p.executeQuery();
-							while(r.next()){
-								if(r.getString("request").equals("pending")){
+								ResultSet r=p.executeQuery();
+								while(r.next()){
+									if(r.getString("request").equals("pending")){
 							%>
 								<tr>
 									<td>
@@ -238,7 +242,7 @@
 								</tr>
 							<%} 
 							}
-							con.close();
+							con4.close();
 							%>
 							</tbody>
 					</table>

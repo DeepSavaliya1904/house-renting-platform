@@ -2,6 +2,7 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <%! int id = 0; %>
 <!DOCTYPE html>
 
@@ -20,26 +21,26 @@
     </style>
 </head>
 
+<!-- body start -->
 <body>
 	<%
+		//check owner already login or not
     	String id = (String) session.getAttribute("id");
 		if(session.getAttribute("owner")==null){
 			response.sendRedirect("error.jsp");
 		}
 	%>
 	<%
+		Connection con=null;
 		try{
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
+			con=DbConnection.getConnection();
 			PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
 			p.setString(1,id);
 			ResultSet r=p.executeQuery();
 			if(r.next()){
-				
+				//track activity
 		    	Date currentDate = new Date();
-		    	Class.forName("com.mysql.jdbc.Driver");
-				Connection con4=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-				PreparedStatement p4=con4.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
+		    	PreparedStatement p4=con.prepareStatement("insert into track_activity(Username,Role,Date,Time,Activity) values(?,?,?,?,?)");
 				p4.setString(1,r.getString("name"));
 				p4.setString(2,"owner");
 				p4.setString(3,new java.text.SimpleDateFormat("YYYY-MM-dd").format(currentDate));
@@ -49,6 +50,9 @@
 			}
 		}catch(Exception e){
 			e.printStackTrace();
+		}finally{
+			//close connection
+			con.close();
 		}
 	%>
 	<section id="sidebar">
@@ -103,14 +107,14 @@
 			</form>
 			<h5>
 				<%
-					Class.forName("com.mysql.jdbc.Driver");
-					Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-					PreparedStatement p=con.prepareStatement("select *from owner_details where owner_id=?");
+					Connection con1=DbConnection.getConnection();
+					PreparedStatement p=con1.prepareStatement("select *from owner_details where owner_id=?");
 					p.setString(1,id);
 					ResultSet r=p.executeQuery();
 					if(r.next()){
 						out.println(r.getString("name"));
 					}
+					con1.close();
 				%>
 			</h5>
 			<a href="#" class="profile">
@@ -139,7 +143,10 @@
 						</li>
 						</ul>
 				</div>
-			</div><table class="table" style="margin-top: 10px;">
+			</div>
+			<!-- table -->
+			<table class="table" style="margin-top: 10px;">
+				<!-- table heading -->
                 <thead class="table-dark">
                   <tr>
                     <th>House ID</th>
@@ -154,11 +161,11 @@
                     <th>Manage</th>
                   </tr>
                 </thead>
-              <tbody>
+                <!-- table body -->
+              	<tbody>
 				    <%
-				        Class.forName("com.mysql.jdbc.Driver");
-				        Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-				        PreparedStatement p1=con1.prepareStatement("select * from house_details where owner_id=?");
+				        Connection con2=DbConnection.getConnection();
+				        PreparedStatement p1=con2.prepareStatement("select * from house_details where owner_id=?");
 				        p1.setString(1, id);
 				        ResultSet r1=p1.executeQuery();
 				        while(r1.next()){
@@ -184,10 +191,12 @@
 				            </form>
 				        </td>		
 				    </tr>
-				    <% } %>
+				    <% }
+				        //close connection
+				       con2.close();
+				    %>
 				</tbody>
               </table>
-			
 		</main>
 	</section>
 	<script src="script.js"></script>

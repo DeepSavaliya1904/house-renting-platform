@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="org.json.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,6 +33,7 @@
 </head>
 <body>
 	 <%
+	 	//check owner already login or not
 	 	if(session.getAttribute("owner")==null){
 	 		response.sendRedirect("error.jsp");
 	 	}
@@ -53,9 +55,9 @@
     <br><br>
     <form action="../UpdateOwner" method="POST">
         <%
+        	Connection con=null; 
             try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection con = DriverManager.getConnection("jdbc:mysql://localhost/house_renting", "root", "");
+                con = DbConnection.getConnection();
                 PreparedStatement p = con.prepareStatement("select * from owner_details where owner_id=?");
                 p.setString(1,request.getParameter("id"));
                 ResultSet r = p.executeQuery();
@@ -87,11 +89,14 @@
         </div>
         <br>
         <%
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    %>
+	        	}
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }finally{
+		    	//close connection
+		    	con.close();
+		    }
+    	%>
     <input type="submit" name="submit" class="btn btn-outline-primary me-3" style="width: 100px; height: 45px; margin-top: -20px;" value="Update">
 </form>
 <br><br><br>

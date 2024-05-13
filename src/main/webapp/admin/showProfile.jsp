@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.sql.*" %>
+<%@ page import="house_renting_platform.DbConnection" %>
 <%! int id = 0; %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,12 +13,13 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	</head>
 	<body>
-	        <%
-					if(session.getAttribute("admin") == null)									
-					{
-						response.sendRedirect("error.jsp");							
-					}
-			%>
+		<%
+			//check admin already login or not
+			if(session.getAttribute("admin") == null)									
+			{
+				response.sendRedirect("error.jsp");							
+			}
+		%>
 		<div class="sidebar">
 			<div class="logo"></div>
 			<ul class="menu">
@@ -92,30 +94,21 @@
                 <th>Activity</th>
               </tr>
             </thead>
-            	<%
-            		try{
-                		
-            		}catch(Exception e){
-            			out.println(e);
-            		}
-               %>
             <tbody>
 				<%
+					Connection con=null; 	
 					try{
 						String login_id=request.getParameter("id");
-                		Class.forName("com.mysql.jdbc.Driver");
-                		Connection con1=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
-                		PreparedStatement p1=con1.prepareStatement("select *from login_details where login_id=?");
+                		con=DbConnection.getConnection();
+                		PreparedStatement p1=con.prepareStatement("select *from login_details where login_id=?");
                 		p1.setString(1,login_id);
                 		ResultSet r1=p1.executeQuery();
                 		while(r1.next()){
-							Class.forName("com.mysql.jdbc.Driver");
-							Connection con=DriverManager.getConnection("jdbc:mysql://localhost/house_renting","root","");
 							PreparedStatement p=con.prepareStatement("select *from track_activity where Username=?");
 							p.setString(1,r1.getString("username"));
 							ResultSet r=p.executeQuery();
 							while(r.next()){
-						%>
+				%>
 							<tr>		
 									<td><%out.println(r.getString("Username")); %></td>
 									<td><%out.println(r.getString("Role")); %></td>
@@ -123,8 +116,8 @@
 									<td><%out.println(r.getString("Time")); %></td>				
 									<td><%out.println(r.getString("Activity")); %></td>						
 							</tr>
-						<%		
-						}
+					<%		
+								}
                 			}
 						}catch(Exception e){
 							out.println(e);
